@@ -15,12 +15,12 @@ module Oschii
     end
   end
 
-  def cloud
-    @cloud ||= Cloud.new.populate
+  def cloud(silent: false)
+    @cloud ||= Cloud.new(silent: silent)
   end
 
   def populate
-    @cloud.nil? ? cloud : cloud.populate
+    cloud.populate
   end
 
   def serial
@@ -44,6 +44,6 @@ end
 
 unless ENV['CONNECT'].nil?
   include Oschii
-  cloud
+  populate
 end
 

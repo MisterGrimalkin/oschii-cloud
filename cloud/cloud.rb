@@ -11,9 +11,10 @@ module Oschii
     RESPONSE_PORT = 3333
     RESPONSE_ADDR = '/i_am_oschii'
 
-    def initialize
+    def initialize(silent: false)
       @server = OSC::EMServer.new(RESPONSE_PORT)
       @nodes = {}
+      @silent = silent
       start_listening
 
       @http_handlers = {
@@ -22,16 +23,16 @@ module Oschii
 
     end
 
-    attr_reader :server, :http_handlers, :nodes
+    attr_reader :server, :http_handlers, :nodes, :silent
 
     def start_listening
       server.add_method RESPONSE_ADDR do |message|
         name = message.to_a.first.split(':').last.strip
         if (node = nodes[name.downcase.to_sym])
-          puts "\n~~#{name} - is back\n"
+          puts "\n~~#{name} - is back\n" unless silent
           node.refresh
         else
-          puts "\n~~#{name} - is online\n"
+          puts "\n~~#{name} - is online\n" unless silent
           nodes[name.downcase.to_sym] = Node.new(ip: message.ip_address)
         end
       end
@@ -59,6 +60,22 @@ module Oschii
           session = http_server.accept
         end
       end
+    end
+
+    def wait_for(oschii_name)
+      print "> Waiting for '#{oschii_name}'.... "
+      find_nodes
+      oschii = nil
+      started = Time.now
+      while oschii.nil? && Time.now - started <= 10
+        oschii = get oschii_name
+      end
+      if oschii
+        puts 'FOUND :D'
+      else
+        puts 'NOT FOUND :('
+      end
+      oschii
     end
 
     attr_reader :monitor
@@ -99,9 +116,9 @@ module Oschii
       http_handlers[method.to_s.downcase.to_sym][actual_path] = block
     end
 
-    def populate
+    def find_nodes
       @nodes = {}
-      puts '~~Pinging network....'
+      puts '~~Pinging network....' unless silent
       base_ip = local_ip_address.split('.')[0..2].join('.')
       (1..254).each do |i|
         target_ip = "#{base_ip}.#{i}"
@@ -109,13 +126,17 @@ module Oschii
         client.send(OSC::Message.new(PING_ADDR, 1))
         sleep 0.001
       end
-      puts '~~Listening....'
+    end
+
+    def populate
+      find_nodes
+      puts '~~Listening....' unless silent
       start_waiting = Time.now
       while Time.now - start_waiting < 3
         sleep 0.2
       end
 
-      print_nodes
+      print_nodes unless silent
       self
     end
 

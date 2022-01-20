@@ -2,18 +2,15 @@ require_relative 'oschii'
 
 include Oschii
 
-cloud
-
 target_rate = ARGV[0]&.to_i || 100
 wait_time = 1.0 / target_rate
 
 oschii_name = ARGV[1] || 'Ada'
 osc_address = ARGV[2] || 'tracker'
 
-oschii = nil
-while oschii.nil?
-  oschii = cloud.get oschii_name
-end
+oschii = cloud.wait_for(oschii_name)
+
+exit unless oschii
 
 value = 0
 delta = 1

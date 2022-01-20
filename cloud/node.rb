@@ -383,20 +383,27 @@ module Oschii
       nodes
     end
 
-    def logger(sensors: nil, drivers: nil,
-               monitors: nil, remotes: nil,
-               all: nil, to_file: nil)
+    def logger(params = {})
       current_logger = settings['logger']
-      unless all.nil?
-        sensors = all
-        drivers = all
-        monitors = all
-        remotes = all
-      end
+
+      all = params[:all]
+
+      sensors = all.nil? ? params[:sensors] : all
+      drivers = all.nil? ? params[:drivers] : all
+      monitors = all.nil? ? params[:monitors] : all
+      remotes = all.nil? ? params[:remotes] : all
+      network_in = all.nil? ? params[:network_in] : all
+      network_out = all.nil? ? params[:network_out] : all
+      timestamp = params[:timestamp]
+      to_file = params[:to_file]
+
       current_logger['sensors'] = sensors unless sensors.nil?
       current_logger['drivers'] = drivers unless drivers.nil?
       current_logger['monitors'] = monitors unless monitors.nil?
       current_logger['remotes'] = remotes unless remotes.nil?
+      current_logger['networkIn'] = network_in unless network_in.nil?
+      current_logger['networkOut'] = network_out unless network_out.nil?
+      current_logger['timestamp'] = timestamp unless timestamp.nil?
       current_logger['logToFile'] = to_file unless to_file.nil?
       update_settings({'logger' => current_logger})
       current_logger = settings['logger']
