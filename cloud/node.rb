@@ -453,6 +453,12 @@ module Oschii
       end
     end
 
+    def open
+      unless serial?
+        `xdg-open http://#{ip}`
+      end
+    end
+
     private
 
     attr_accessor :capturing_serial, :serial_line_buffer
