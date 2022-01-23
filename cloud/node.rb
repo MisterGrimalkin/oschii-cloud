@@ -156,6 +156,12 @@ module Oschii
       JSON.parse raw_config
     end
 
+    def status
+      return {} if serial?
+
+      JSON.parse(RestClient.get("http://#{ip}/status")&.body || '')
+    end
+
     def sensors
       config['sensors'].map { |s| s['name'] }
     end
