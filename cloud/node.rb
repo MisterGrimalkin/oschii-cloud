@@ -72,7 +72,6 @@ module Oschii
         end
         return true
       end
-      false
     end
 
     def version
@@ -179,19 +178,19 @@ module Oschii
     end
 
     def remotes
-      config['driverRemotes'].map { |r| r['address'] }
+      config['remotes'].map { |r| r['address'] }
     end
 
     def remote(address)
-      config['driverRemotes'].select { |r| r['address']==address || r['address']=="/#{address}" }.first
+      config['remotes'].select { |r| r['address']==address || r['address']=="/#{address}" }.first
     end
 
     def monitors
-      config['sensorMonitors'].map { |m| "sensor:#{m['sensor']}" }
+      config['monitors'].map { |m| "sensor:#{m['sensor']}" }
     end
 
     def monitor(sensor_name)
-      mons = config['sensorMonitors'].select { |m| m['sensor'] == sensor_name }
+      mons = config['monitors'].select { |m| m['sensor'] == sensor_name }
       mons.size==1 ? mons[0] : mons
     end
 

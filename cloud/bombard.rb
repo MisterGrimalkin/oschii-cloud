@@ -8,7 +8,7 @@ wait_time = 1.0 / target_rate
 oschii_name = ARGV[1] || 'Ada'
 osc_address = ARGV[2] || 'tracker'
 
-oschii = cloud.wait_for(oschii_name)
+oschii = cloud(silent: true).wait_for(oschii_name)
 
 exit unless oschii
 
