@@ -133,8 +133,11 @@ module Oschii
     def update_config(new_config = nil, file: nil)
       unless file.nil?
         puts 'Reading file....'
-        new_config = JSON.parse(File.read(file))
+        self.config = JSON.parse(File.read(file))
       end
+    end
+
+    def config=(new_config)
       if serial?
         puts 'Querying serial port....'
         if serial_query('config=') == '>> Enter new configuration <<'
@@ -144,7 +147,7 @@ module Oschii
       else
         RestClient.post(
             "http://#{ip}/config",
-            JSON.pretty_generate(new_config),
+            new_config.to_json,
             content_type: 'application/json'
         )
       end
