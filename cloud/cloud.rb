@@ -62,12 +62,12 @@ module Oschii
       end
     end
 
-    def wait_for(oschii_name)
+    def wait_for(oschii_name, timeout: 10)
       print "> Waiting for '#{oschii_name}'.... "
       find_nodes
       oschii = nil
       started = Time.now
-      while oschii.nil? && Time.now - started <= 10
+      while oschii.nil? && Time.now - started <= timeout
         oschii = get oschii_name
       end
       if oschii

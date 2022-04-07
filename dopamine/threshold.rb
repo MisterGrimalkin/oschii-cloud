@@ -9,28 +9,28 @@ class Threshold
         Door.new(3)
     ]
 
-    doors[0].rgb_rest = [255, 64, 64]
+    doors[0].rgb_rest = [0, 220, 70]
     doors[0].rgb_play = [0, 0, 0]
-    doors[0].w_rest = 0
+    doors[0].w_rest = 50
     doors[0].w_play = 255
     doors[0].pwm_module = 'PWM-A'
     doors[0].mp3_player = 'MP3-A'
 
-    doors[1].rgb_rest = [64, 255, 64]
+    doors[1].rgb_rest = [0, 255, 0]
     doors[1].rgb_play = [0, 0, 0]
     doors[1].w_rest = 0
     doors[1].w_play = 255
     doors[1].pwm_module = 'PWM-B'
     doors[1].mp3_player = 'MP3-B'
 
-    doors[2].rgb_rest = [64, 64, 255]
+    doors[2].rgb_rest = [0, 0, 255]
     doors[2].rgb_play = [0, 0, 0]
     doors[2].w_rest = 0
     doors[2].w_play = 255
     doors[2].pwm_module = 'PWM-C'
     doors[2].mp3_player = 'MP3-C'
 
-    doors[3].rgb_rest = [255, 255, 64]
+    doors[3].rgb_rest = [255, 16, 0]
     doors[3].rgb_play = [0, 0, 0]
     doors[3].w_rest = 0
     doors[3].w_play = 255
@@ -96,7 +96,62 @@ class Threshold
         },
         sensors: doors.map(&:sensor),
         drivers: doors.map(&:drivers).flatten,
-        remotes: doors.map(&:remote)
+        remotes: doors.map(&:remote) + [
+            {
+                address: '/reset',
+                writeTo: [
+                    {
+                        target: 'I2C:MP3-A',
+                        message: [ 2, 1 ]
+                    },
+                    {
+                        target: 'I2C:MP3-B',
+                        message: [ 2, 1 ]
+                    },
+                    {
+                        target: 'I2C:MP3-C',
+                        message: [ 2, 1 ]
+                    },
+                    {
+                        target: 'I2C:MP3-D',
+                        message: [ 2, 1 ]
+                    }
+                ]
+            },
+            {
+              address: '/mp3',
+              writeTo: [
+                  {
+                      target: 'I2C:MP3-A'
+                  },
+                  {
+                      target: 'I2C:MP3-B'
+                  },
+                  {
+                      target: 'I2C:MP3-C'
+                  },
+                  {
+                      target: 'I2C:MP3-D'
+                  }
+              ]
+            },
+            {
+                address: '/mp3a',
+                target: 'I2C:MP3-A'
+            },
+            {
+                address: '/mp3b',
+                target: 'I2C:MP3-B'
+            },
+            {
+                address: '/mp3c',
+                target: 'I2C:MP3-C'
+            },
+            {
+                address: '/mp3d',
+                target: 'I2C:MP3-D'
+            }
+        ]
     }
 
   end
@@ -114,4 +169,40 @@ class Threshold
   def inspect
     "#<DopamineThreshold #{doors}>"
   end
+end
+
+if ARGV[0] == 'upload'
+  require_relative '../cloud/oschii.rb'
+
+  include Oschii
+
+  name = ARGV[1]
+
+  unless name
+    puts 'Specify Oschii name'
+    exit
+  end
+
+  oschii = cloud(silent: true).wait_for(name)
+
+  unless oschii
+    exit
+  end
+
+  puts '> Clearing existing configuration'
+
+  oschii.config={}
+
+  oschii = cloud(silent: true).wait_for(name)
+
+  puts '> Pushing Dopamine Threshold'
+
+  threshold = Threshold.new
+
+  oschii.config = threshold.config
+
+  oschii = cloud(silent: true).wait_for(name, timeout: 20)
+
+  puts '> Done'
+
 end
