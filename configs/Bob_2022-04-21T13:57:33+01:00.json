@@ -1,0 +1,253 @@
+{
+  "name": "I<sup>2</sup>C Test 1",
+  "receivers": [
+    {
+      "name": "Barrington",
+      "ip": "192.168.1.200"
+    },
+    {
+      "name": "Barrington2",
+      "ip": "192.168.1.189"
+    }
+  ],
+  "i2c": {
+    "sdaPin": 4,
+    "sclPin": 5,
+    "clock": 400000,
+    "modules": [
+      {
+        "name": "GPIO-A",
+        "type": "gpio",
+        "address": "0x20"
+      },
+      {
+        "name": "PWM-A",
+        "type": "pwm",
+        "address": "0x40",
+        "pwmFreq": 1000,
+        "oscFreq": 23000000
+      },
+      {
+        "name": "MP3",
+        "type": "mp3",
+        "address": "0x37"
+      }
+    ]
+  },
+  "sensors": [
+    {
+      "name": "button1",
+      "type": "gpio",
+      "i2cModule": "GPIO-A",
+      "pin": 0,
+      "resistor": "up",
+      "onValue": 100,
+      "offValue": 0,
+      "bounceFilter": 100,
+      "invert": true
+    },
+    {
+      "name": "button2",
+      "type": "gpio",
+      "i2cModule": "GPIO-A",
+      "pin": 1,
+      "resistor": "up",
+      "offValue": 0,
+      "bounceFilter": 100,
+      "invert": true
+    }
+  ],
+  "drivers": [
+    {
+      "name": "red",
+      "type": "gpio",
+      "i2cModule": "GPIO-A",
+      "pin": 8,
+      "initialValue": 0,
+      "autoRemote": true
+    },
+    {
+      "name": "green",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "initialValue": 0,
+      "pin": 0
+    },
+    {
+      "name": "blue",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "initialValue": 0,
+      "pin": 9
+    }
+  ],
+  "remotes": [
+    {
+      "address": "/mp3",
+      "target": "I2C:MP3"
+    },
+    {
+      "address": "/green",
+      "driver": "green",
+      "valueTransform": {
+        "outputRange": [
+          0,
+          4095
+        ]
+      }
+    },
+    {
+      "address": "/blue",
+      "driver": "blue",
+      "valueTransform": {
+        "outputRange": [
+          0,
+          4095
+        ]
+      }
+    },
+    {
+      "address": "/green_pulse",
+      "driver": "green",
+      "envelope": {
+        "loop": true,
+        "stopAmount": 0,
+        "valueTransform": {
+          "outputRange": [
+            0,
+            4095
+          ]
+        },
+        "steps": [
+          {
+            "amount": 0,
+            "time": 250
+          },
+          {
+            "startAmountFromArgument": 0,
+            "endAmount": 0,
+            "time": 250
+          }
+        ]
+      }
+    },
+    {
+      "address": "/blue_pulse",
+      "driver": "blue",
+      "envelope": {
+        "loop": true,
+        "stopAmount": 0,
+        "valueTransform": {
+          "outputRange": [
+            0,
+            4095
+          ]
+        },
+        "steps": [
+          {
+            "startAmountFromArgument": 0,
+            "endAmount": 0,
+            "time": 250
+          },
+          {
+            "amount": 0,
+            "time": 250
+          }
+        ]
+      }
+    },
+    {
+      "address": "/tracker",
+      "driver": "red",
+      "valueTransform": {
+        "inputRange": [
+          90,
+          100
+        ]
+      },
+      "envelope": {
+        "loop": true,
+        "stopAmount": 0,
+        "steps": [
+          {
+            "amount": 100,
+            "time": 200
+          },
+          {
+            "amount": 0,
+            "time": 200
+          }
+        ]
+      }
+    }
+  ],
+  "monitors": [
+    {
+      "triggerSensor": "button1",
+      "sendTo": [
+        {
+          "*": "/button1"
+        },
+        {
+          "~": "/green_pulse",
+          "message": [
+            {
+              "source": "Sensor:button1",
+              "valueTransform": {
+                "outputRange": [
+                  0,
+                  4095
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "~": "/blue_pulse",
+          "message": [
+            {
+              "source": "Sensor:button1",
+              "valueTransform": {
+                "outputRange": [
+                  0,
+                  4095
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "condition": {
+            "left": "Sensor:button1",
+            ">": 0
+          },
+          "message": [
+            3
+          ],
+          "~": "/mp3"
+        }
+      ]
+    },
+    {
+      "sensor": "button2",
+      "sendTo": [
+        {
+          "*": "/button2"
+        },
+        {
+          "~": "/red"
+        },
+        {
+          "condition": {
+            "left": "message",
+            ">": 0
+          },
+          "message": [
+            1
+          ],
+          "~": "/mp3"
+        }
+      ]
+    }
+  ]
+}

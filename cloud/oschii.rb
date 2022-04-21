@@ -24,7 +24,7 @@ module Oschii
   end
 
   def serial
-    @serial ||= Node.find_serial
+    @serial ||= cloud.find_serial
   end
 
   def method_missing(m, *args, &block)

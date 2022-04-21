@@ -7,10 +7,10 @@ require 'eventmachine'
 require 'byebug'
 
 module Oschii
+  NodeUnavailableError = Class.new(StandardError)
   class Node
     BAUD_RATE = 115200
 
-    NodeUnavailableError = Class.new(StandardError)
     CancelSerialQuery = Class.new(StandardError)
 
     def initialize(ip: nil, serial: nil)
@@ -40,7 +40,13 @@ module Oschii
       remaining_attempts = 3
       while remaining_attempts > 0
         begin
-          return self if poke
+          if poke
+            name
+            version
+            return true
+          end
+          return false
+
         rescue RubySerial::Error => e
           raise NodeUnavailableError, case e.message
                                         when 'ENOENT'
@@ -55,7 +61,7 @@ module Oschii
         end
         remaining_attempts -= 1
       end
-      raise NodeUnavailableError, 'Oschii did not respond'
+      raise NodeUnavailableError, '(no response)'
     end
 
     def poke
@@ -75,11 +81,21 @@ module Oschii
     end
 
     def version
-      @version ||= if serial?
-                     serial_query 'version'
-                   else
-                     RestClient.get("http://#{ip}/version")&.body
-                   end
+      return @version if @version
+
+      if serial?
+        attempts = 3
+        while attempts > 0
+          @version = serial_query 'version'
+          if @version.empty?
+            attempts -= 1
+          else
+            attempts = 0
+          end
+        end
+      else
+        @version = RestClient.get("http://#{ip}/version")&.body
+      end
     end
 
     def tail(filter: nil)
@@ -111,11 +127,23 @@ module Oschii
     end
 
     def name
-      @name ||= if serial?
-                  serial_query 'name'
-                else
-                  RestClient.get("http://#{ip}/name")&.body
-                end
+      return @name if @name
+
+      if serial?
+        attempts = 3
+        while attempts > 0
+          @name = serial_query 'name'
+          if @name.empty?
+            attempts -= 1
+          else
+            attempts = 0
+          end
+        end
+      else
+        @name = RestClient.get("http://#{ip}/name")&.body
+      end
+
+      @name
     end
 
     def name=(new_name)
@@ -130,11 +158,41 @@ module Oschii
       refresh
     end
 
-    def update_config(new_config = nil, file: nil)
-      unless file.nil?
-        puts 'Reading file....'
-        self.config = JSON.parse(File.read(file))
+    def upload_config(filename = nil, silent: false)
+      file = filename
+
+      if file.nil?
+        filenames = Dir.glob("configs/#{name}_*.json")
+        if filenames.empty?
+          puts 'No previous config' unless silent
+          return
+        end
+        file = filenames.sort.last
+
+        unless silent
+          display_name = file.split('/')[-1]
+                             .split('_')[-1]
+                             .split('+')[0]
+                             .gsub('T', ' ')
+                             .gsub('.json', '')
+          puts "Latest: #{display_name}"
+          begin
+            prompt '>> [ENTER] to upload, [ESC] to cancel <<'
+          rescue CancelSerialQuery
+            return
+          end
+        end
       end
+
+      self.config = JSON.parse File.read(file)
+
+      self
+    end
+
+    def save_config(filename = nil, silent: false)
+      filename ||= "configs/#{name}_#{Time.now.iso8601}.json"
+      File.write filename, JSON.pretty_generate(config)
+      puts "Saved #{filename.split('/')[-1]}" unless silent
     end
 
     def config=(new_config)
@@ -159,9 +217,15 @@ module Oschii
     end
 
     def status
-      return {} if serial?
+      if serial?
+        JSON.parse(serial_query('status'))
+      else
+        JSON.parse(RestClient.get("http://#{ip}/status")&.body || '')
+      end
+    end
 
-      JSON.parse(RestClient.get("http://#{ip}/status")&.body || '')
+    def uptime
+      status['uptime']
     end
 
     def sensors
@@ -330,11 +394,13 @@ module Oschii
     end
 
     def serial_query(query, timeout: 3)
+      # puts "#> #{query}"
       purge_serial
       serial_port.write (query.empty? ? "\n" : query)
       sleep timeout
       result = serial_lines.join
       serial_lines.clear
+      # puts "   #{result}"
       result
     end
 
@@ -369,28 +435,6 @@ module Oschii
       self.capturing_serial = false
     end
 
-    def self.find_serial(port = nil)
-      return Node.new(serial: port) if port
-
-      puts 'Scanning serial ports....'
-
-      nodes = []
-
-      9.times do |i|
-        port = "/dev/ttyUSB#{i}"
-        print "#{port}   "
-        begin
-          node = Node.new(serial: port)
-          puts "Oschii - #{node.name}"
-          nodes << node
-        rescue NodeUnavailableError => e
-          puts e.message
-        end
-      end
-
-      nodes
-    end
-
     def logger(params = {})
       current_logger = settings['logger']
 
@@ -420,6 +464,10 @@ module Oschii
 
     def inspect
       "<#{self.class.name}[#{name}] #{serial? ? serial : ip_address} (v#{version})>"
+    end
+
+    def fire(address, *values)
+      send_osc address, *values
     end
 
     def send_osc(address, *values, port: 3333)

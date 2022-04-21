@@ -25,15 +25,44 @@ module Oschii
 
     attr_reader :server, :http_handlers, :nodes, :silent
 
+    def find_serial(port = nil)
+      return Node.new(serial: port) if port
+
+      puts "\n~~> Scanning Serial Ports...."
+
+      9.times do |i|
+        port = "/dev/ttyUSB#{i}"
+        print "\n~~> #{port}: "
+        begin
+          node = Node.new(serial: port)
+          name = "serial_#{node.name.downcase}".to_sym
+          if (existing_node = nodes[name.downcase.to_sym])
+            existing_node.refresh
+          else
+            nodes[name] = node
+            node.refresh
+          end
+          puts "'#{node.name}'"
+        rescue ::Oschii::NodeUnavailableError => e
+          puts e.message
+        end
+      end
+
+      print_nodes
+
+      self
+    end
+
     def start_listening
       server.add_method RESPONSE_ADDR do |message|
         name = message.to_a.first.split(':').last.strip
         if (node = nodes[name.downcase.to_sym])
-          puts "\n~~#{name} - is back\n" unless silent
+          puts "\n==> '#{name}' is back\n" unless silent
           node.refresh
         else
-          puts "\n~~#{name} - is online\n" unless silent
-          nodes[name.downcase.to_sym] = Node.new(ip: message.ip_address)
+          node = Node.new(ip: message.ip_address)
+          puts "\n==> '#{name}' connected @ #{node.ip_address}\n" unless silent
+          nodes[name.downcase.to_sym] = node
         end
       end
       Thread.new do
@@ -63,7 +92,7 @@ module Oschii
     end
 
     def wait_for(oschii_name, timeout: 10)
-      print "> Waiting for '#{oschii_name}'.... "
+      print "==> Waiting for '#{oschii_name}'.... "
       find_nodes
       oschii = nil
       started = Time.now
@@ -118,7 +147,6 @@ module Oschii
 
     def find_nodes
       @nodes = {}
-      puts '~~Pinging network....' unless silent
       base_ip = local_ip_address.split('.')[0..2].join('.')
       (1..254).each do |i|
         target_ip = "#{base_ip}.#{i}"
@@ -129,8 +157,8 @@ module Oschii
     end
 
     def populate
+      puts '==> Scanning Network....' unless silent
       find_nodes
-      puts '~~Listening....' unless silent
       start_waiting = Time.now
       while Time.now - start_waiting < 3
         sleep 0.2
@@ -142,23 +170,40 @@ module Oschii
 
     def print_nodes
       puts
+      puts self.to_s
+      puts
+      puts
+    end
 
-      return if nodes.empty?
+    def to_s
+      return '' if nodes.empty?
 
-      ip_width = 0
+      result = ''
+
+      conn_width = 0
       name_width = 0
       nodes.each do |name, node|
-        ip_width = node.ip.size if node.ip.size > ip_width
+        if node.serial?
+          conn_width = node.serial_port.size if node.serial_port.size > conn_width
+        else
+          conn_width = node.ip.size if node.ip.size > conn_width
+        end
         name_width = name.size if name.size > name_width
       end
 
       sorted = nodes.to_a.sort_by { |name, _node| name }.to_h
 
-      puts "\e[1m#{'Name'.ljust(name_width+3)}#{'IP Address'.ljust(ip_width+3)}#{'Version'}\e[22m"
+      result += "\e[1m#{'Name'.ljust(name_width+3)}#{'Connection'.ljust(conn_width+3)}#{'Version'}\e[22m"
       sorted.each do |_name, node|
-        puts "#{node.name.ljust(name_width)}   #{node.ip.ljust(ip_width)}   #{node.version}"
+        connection = if node.serial?
+                       node.serial.ljust(conn_width)
+                     else
+                       node.ip.ljust(conn_width)
+                     end
+        result += "\n#{node.name.ljust(name_width)}   #{connection}   #{node.version}"
       end
-      puts
+      result += "\n"
+      result
     end
 
     def get(name)

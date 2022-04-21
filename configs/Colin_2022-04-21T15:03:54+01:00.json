@@ -1,0 +1,116 @@
+{
+  "receivers": [
+    {
+      "name": "Barrington",
+      "ip": "192.168.1.200"
+    },
+    {
+      "name": "Barrington2",
+      "ip": "192.168.1.189"
+    },
+    {
+      "name": "Ada",
+      "ip": "192.168.1.201"
+    },
+    {
+      "name": "Bob",
+      "ip": "192.168.1.202"
+    }
+  ],
+  "i2c": {
+    "sdaPin": 4,
+    "sclPin": 5,
+    "modules": [
+      {
+        "name": "KEYPAD-A",
+        "type": "keypad",
+        "address": "0x70"
+      }
+    ]
+  },
+  "sensors": [
+    {
+      "name": "keypad",
+      "type": "keypad",
+      "i2cModule": "KEYPAD-A",
+      "onValue": 100,
+      "offValue": 0,
+      "allKeys": true
+    }
+  ],
+  "drivers": [
+    {
+      "name": "keypad",
+      "type": "keypad",
+      "i2cModule": "KEYPAD-A"
+    }
+  ],
+  "remotes": [
+    {
+      "address": "/keypad",
+      "condition": {
+        "left": "Sensor:keypad",
+        "<=": 8
+      },
+      "driver": "keypad"
+    }
+  ],
+  "monitors": [
+    {
+      "sensor": "keypad",
+      "sendTo": [
+        {
+          "receiver": "Ada",
+          "address": "/rainbow",
+          "message": [
+            {
+              "source": "message",
+              "arguments": [
+                1,
+                7
+              ]
+            }
+          ]
+        },
+        {
+          "receiver": "Ada",
+          "address": "/dimmer",
+          "message": [
+            {
+              "source": "Sensor:Keypad",
+              "valueTransform": {
+                "inputRange": [
+                  8,
+                  32
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "receiver": "Bob",
+          "address": "/red",
+          "message": [
+            {
+              "source": "message",
+              "argument": 8
+            }
+          ]
+        },
+        {
+          "~": "/keypad",
+          "message": [
+            2,
+            {
+              "source": "message",
+              "arguments": [
+                1,
+                16
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

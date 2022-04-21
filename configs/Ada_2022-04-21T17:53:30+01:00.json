@@ -1,0 +1,758 @@
+{
+  "name": "Native Test 1",
+  "receivers": [
+    {
+      "name": "Barrington",
+      "ip": "192.168.1.200"
+    },
+    {
+      "name": "Barrington2",
+      "ip": "192.168.1.189"
+    },
+    {
+      "name": "Bob",
+      "ip": "192.168.1.202"
+    }
+  ],
+  "sensors": [
+    {
+      "name": "ultrasonic",
+      "type": "hc-sr04",
+      "trigPin": 13,
+      "echoPin": 12,
+      "condition": {
+        "left": "Sensor:button4",
+        ">=": 1
+      },
+      "valueTransform": {
+        "inputRange": [
+          300,
+          3000
+        ],
+        "discardOutliers": 200,
+        "flipRange": true
+      }
+    },
+    {
+      "name": "knob",
+      "type": "analog",
+      "pin": 36,
+      "samples": 20,
+      "valueTransform": {
+        "inputRange": [
+          0,
+          4095
+        ]
+      }
+    },
+    {
+      "name": "button1",
+      "type": "gpio",
+      "pin": 32,
+      "resistor": "down",
+      "bounceFilter": 100
+    },
+    {
+      "name": "button2",
+      "type": "gpio",
+      "pin": 33,
+      "resistor": "up",
+      "bounceFilter": 100,
+      "invert": true
+    },
+    {
+      "name": "button3",
+      "type": "gpio",
+      "pin": 25,
+      "resistor": "down",
+      "bounceFilter": 100
+    },
+    {
+      "name": "button4",
+      "type": "gpio",
+      "pin": 26,
+      "resistor": "up",
+      "bounceFilter": 100,
+      "offValue": 0,
+      "invert": true
+    },
+    {
+      "name": "touch1",
+      "type": "touch",
+      "pin": 4,
+      "onValue": 100,
+      "offValue": 0,
+      "holdOnFilter": 100,
+      "sensitivity": 60
+    },
+    {
+      "name": "touch2",
+      "type": "touch",
+      "pin": 2,
+      "onValue": 100,
+      "offValue": 0,
+      "holdOnFilter": 100,
+      "sensitivity": 60
+    }
+  ],
+  "drivers": [
+    {
+      "name": "red",
+      "type": "pwm",
+      "pin": 16,
+      "autoRemote": true
+    },
+    {
+      "name": "orange",
+      "type": "pwm",
+      "pin": 17,
+      "autoRemote": true
+    },
+    {
+      "name": "yellow",
+      "type": "pwm",
+      "pin": 18,
+      "autoRemote": true
+    },
+    {
+      "name": "green",
+      "type": "pwm",
+      "pin": 19,
+      "autoRemote": true
+    },
+    {
+      "name": "blue",
+      "type": "pwm",
+      "pin": 21,
+      "autoRemote": true
+    },
+    {
+      "name": "indigo",
+      "type": "pwm",
+      "pin": 22,
+      "autoRemote": true
+    },
+    {
+      "name": "violet",
+      "type": "pwm",
+      "pin": 23,
+      "autoRemote": true
+    },
+    {
+      "name": "dimmer",
+      "type": "dimmer",
+      "zeroCrossPin": 14,
+      "outputPin": 27,
+      "initialValue": 0,
+      "valueTransform": {
+        "outputRange": [
+          0,
+          98
+        ]
+      },
+      "autoRemote": true
+    }
+  ],
+  "remotes": [
+    {
+      "address": "/rainbow",
+      "httpMethod": "get",
+      "writeTo": [
+        {
+          "driver": "red"
+        },
+        {
+          "driver": "orange",
+          "messageArgument": 1
+        },
+        {
+          "driver": "yellow",
+          "messageArgument": 2
+        },
+        {
+          "driver": "green",
+          "messageArgument": 3
+        },
+        {
+          "driver": "blue",
+          "messageArgument": 4
+        },
+        {
+          "driver": "indigo",
+          "messageArgument": 5
+        },
+        {
+          "driver": "violet",
+          "messageArgument": 6
+        }
+      ]
+    },
+    {
+      "address": "/meter",
+      "writeTo": [
+        {
+          "driver": "red",
+          "valueTransform": {
+            "inputRange": [
+              0,
+              16
+            ]
+          }
+        },
+        {
+          "driver": "orange",
+          "valueTransform": {
+            "inputRange": [
+              16,
+              33
+            ]
+          }
+        },
+        {
+          "driver": "yellow",
+          "valueTransform": {
+            "inputRange": [
+              33,
+              50
+            ]
+          }
+        },
+        {
+          "driver": "green",
+          "valueTransform": {
+            "inputRange": [
+              50,
+              64
+            ]
+          }
+        },
+        {
+          "driver": "blue",
+          "valueTransform": {
+            "inputRange": [
+              64,
+              79
+            ]
+          }
+        },
+        {
+          "driver": "indigo",
+          "valueTransform": {
+            "inputRange": [
+              79,
+              88
+            ]
+          }
+        },
+        {
+          "driver": "violet",
+          "valueTransform": {
+            "inputRange": [
+              88,
+              100
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/tracker",
+      "writeTo": [
+        {
+          "driver": "red",
+          "valueTransform": {
+            "inputRange": [
+              83,
+              100
+            ],
+            "setOutliersTo": 83
+          }
+        },
+        {
+          "driver": "orange",
+          "valueTransform": {
+            "inputRange": [
+              66,
+              93
+            ],
+            "setOutliersTo": 66,
+            "mirrorRange": true
+          }
+        },
+        {
+          "driver": "yellow",
+          "valueTransform": {
+            "inputRange": [
+              50,
+              83
+            ],
+            "setOutliersTo": 50,
+            "mirrorRange": true
+          }
+        },
+        {
+          "driver": "green",
+          "valueTransform": {
+            "inputRange": [
+              33,
+              66
+            ],
+            "setOutliersTo": 33,
+            "mirrorRange": true
+          }
+        },
+        {
+          "driver": "blue",
+          "valueTransform": {
+            "inputRange": [
+              16,
+              55
+            ],
+            "setOutliersTo": 16,
+            "mirrorRange": true
+          }
+        },
+        {
+          "driver": "indigo",
+          "valueTransform": {
+            "inputRange": [
+              5,
+              33
+            ],
+            "setOutliersTo": 5,
+            "mirrorRange": true
+          }
+        },
+        {
+          "driver": "violet",
+          "valueTransform": {
+            "inputRange": [
+              0,
+              33
+            ],
+            "setOutliersTo": 0,
+            "mirrorRange": true
+          }
+        }
+      ]
+    },
+    {
+      "address": "/pattern1",
+      "writeTo": [
+        {
+          "driver": "red",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "timeFromArgument": 1
+              },
+              {
+                "amount": 0,
+                "time": 600
+              }
+            ]
+          }
+        },
+        {
+          "driver": "orange",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 100
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "timeFromArgument": 1
+              },
+              {
+                "amount": 0,
+                "time": 500
+              }
+            ]
+          }
+        },
+        {
+          "driver": "yellow",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 200
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "timeFromArgument": 1
+              },
+              {
+                "amount": 0,
+                "time": 400
+              }
+            ]
+          }
+        },
+        {
+          "driver": "green",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 300
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "timeFromArgument": 1
+              },
+              {
+                "amount": 0,
+                "time": 300
+              }
+            ]
+          }
+        },
+        {
+          "driver": "blue",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 400
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "timeFromArgument": 1
+              },
+              {
+                "amount": 0,
+                "time": 200
+              }
+            ]
+          }
+        },
+        {
+          "driver": "indigo",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 500
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "timeFromArgument": 1
+              },
+              {
+                "amount": 0,
+                "time": 100
+              }
+            ]
+          }
+        },
+        {
+          "driver": "violet",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 600
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "timeFromArgument": 1
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/pattern2",
+      "writeTo": [
+        {
+          "driver": "red",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 300
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "time": 400
+              }
+            ]
+          }
+        },
+        {
+          "driver": "orange",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 200
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "time": 400
+              },
+              {
+                "amount": 0,
+                "time": 100
+              }
+            ]
+          }
+        },
+        {
+          "driver": "yellow",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 100
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "time": 400
+              },
+              {
+                "amount": 0,
+                "time": 200
+              }
+            ]
+          }
+        },
+        {
+          "driver": "green",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "time": 400
+              },
+              {
+                "amount": 0,
+                "time": 300
+              }
+            ]
+          }
+        },
+        {
+          "driver": "blue",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 100
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "time": 400
+              },
+              {
+                "amount": 0,
+                "time": 200
+              }
+            ]
+          }
+        },
+        {
+          "driver": "indigo",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 200
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "time": 400
+              },
+              {
+                "amount": 0,
+                "time": 100
+              }
+            ]
+          }
+        },
+        {
+          "driver": "violet",
+          "envelope": {
+            "loop": true,
+            "stopAmount": 0,
+            "steps": [
+              {
+                "amount": 0,
+                "time": 300
+              },
+              {
+                "startAmount": 100,
+                "endAmount": 0,
+                "time": 400
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "monitors": [
+    {
+      "sensor": "ultrasonic",
+      "sendTo": [
+        {
+          "*": "/tracker"
+        },
+        {
+          "~": "/tracker"
+        },
+        {
+          "~": "/dimmer"
+        }
+      ]
+    },
+    {
+      "name": "fill-meter",
+      "sensor": "knob",
+      "sendTo": [
+        {
+          "~": "/meter"
+        },
+        {
+          "*": "/knob"
+        },
+        {
+          "receiver": "Bob",
+          "address": "/mp3",
+          "message": [
+            5,
+            {
+              "source": "Sensor:knob",
+              "valueTransform": {
+                "outputRange": [
+                  0,
+                  31
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "start-pattern-1",
+      "sensor": "button1",
+      "sendTo": [
+        {
+          "~": "/pattern1"
+        }
+      ]
+    },
+    {
+      "name": "start-pattern-2",
+      "sensor": "button2",
+      "sendTo": [
+        {
+          "~": "/pattern2"
+        }
+      ]
+    },
+    {
+      "name": "stop-patterns",
+      "sensor": "button3",
+      "sendTo": [
+        {
+          "message": [
+            0
+          ],
+          "~": "/pattern1"
+        },
+        {
+          "message": [
+            0
+          ],
+          "~": "/pattern2"
+        }
+      ]
+    },
+    {
+      "name": "bob-blue",
+      "sensor": "touch1",
+      "sendTo": [
+        {
+          "receiver": "Bob",
+          "address": "/blue"
+        }
+      ]
+    },
+    {
+      "name": "bob-green",
+      "sensor": "touch2",
+      "sendTo": [
+        {
+          "receiver": "Bob",
+          "address": "/green"
+        }
+      ]
+    },
+    {
+      "name": "bob-off",
+      "sensor": "button4",
+      "sendTo": [
+        {
+          "receiver": "Bob",
+          "address": "/green",
+          "message": [
+            0
+          ]
+        },
+        {
+          "receiver": "Bob",
+          "address": "/blue",
+          "message": [
+            0
+          ]
+        }
+      ]
+    }
+  ]
+}

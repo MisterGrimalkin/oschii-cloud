@@ -1,0 +1,552 @@
+{
+  "name": "Light Controller",
+  "description": "Bailes+Light Office Light Rig",
+  "i2c": {
+    "sdaPin": 4,
+    "sclPin": 5,
+    "clock": 1000000,
+    "modules": [
+      {
+        "name": "GPIO-A",
+        "type": "gpio",
+        "address": "0x20"
+      },
+      {
+        "name": "PWM-A",
+        "type": "pwm",
+        "address": "0x40"
+      }
+    ]
+  },
+  "receivers": [
+    {
+      "name": "Benji",
+      "ip": "192.168.1.56",
+      "oscPort": 3334
+    },
+    {
+      "name": "Brienne",
+      "ip": "192.168.1.95",
+      "oscPort": 3334
+    },
+    {
+      "name": "LXmonitor",
+      "ip": "192.168.1.56",
+      "oscPort": 3339
+    },
+    {
+      "name": "Dan",
+      "ip": "192.168.1.93",
+      "oscPort": 3333
+    }
+  ],
+  "sensors": [
+    {
+      "name": "input0",
+      "type": "gpio",
+      "i2cModule": "GPIO-A",
+      "pin": 0,
+      "onValue": 1,
+      "offValue": -1,
+      "bounceFilter": 10,
+      "holdOnFilter": 100
+    },
+    {
+      "name": "input4",
+      "type": "gpio",
+      "i2cModule": "GPIO-A",
+      "pin": 4,
+      "onValue": 1,
+      "offValue": -1,
+      "bounceFilter": 1000,
+      "holdOnFilter": 1000
+    },
+    {
+      "name": "input5",
+      "type": "gpio",
+      "i2cModule": "GPIO-A",
+      "pin": 5,
+      "onValue": 1,
+      "offValue": -1,
+      "bounceFilter": 1000,
+      "holdOnFilter": 1000
+    },
+    {
+      "name": "input6",
+      "type": "gpio",
+      "i2cModule": "GPIO-A",
+      "pin": 6,
+      "onValue": 1,
+      "offValue": -1,
+      "bounceFilter": 1000,
+      "holdOnFilter": 1000
+    },
+    {
+      "name": "input7",
+      "type": "gpio",
+      "i2cModule": "GPIO-A",
+      "pin": 7,
+      "onValue": 1,
+      "offValue": -1,
+      "bounceFilter": 1000,
+      "holdOnFilter": 1000
+    },
+    {
+      "name": "input8",
+      "type": "gpio",
+      "i2cModule": "GPIO-A",
+      "pin": 8,
+      "onValue": 1,
+      "offValue": -1,
+      "bounceFilter": 1000,
+      "holdOnFilter": 1000
+    },
+    {
+      "name": "input9",
+      "type": "gpio",
+      "i2cModule": "GPIO-A",
+      "pin": 9,
+      "onValue": 1,
+      "offValue": -1,
+      "bounceFilter": 1000,
+      "holdOnFilter": 1000
+    }
+  ],
+  "drivers": [
+    {
+      "name": "output0",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 0
+    },
+    {
+      "name": "output1",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 1
+    },
+    {
+      "name": "output2",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 2
+    },
+    {
+      "name": "output3",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 3
+    },
+    {
+      "name": "output4",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 4
+    },
+    {
+      "name": "output5",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 5
+    },
+    {
+      "name": "output6",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 6
+    },
+    {
+      "name": "output7",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 7
+    },
+    {
+      "name": "output8",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 8
+    },
+    {
+      "name": "output9",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 9
+    },
+    {
+      "name": "output10",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 10
+    },
+    {
+      "name": "output11",
+      "type": "pwm",
+      "i2cModule": "PWM-A",
+      "pin": 11
+    }
+  ],
+  "driverRemotes": [
+    {
+      "address": "/five",
+      "writeTo": [
+        {
+          "driver": "output5",
+          "valueTransform": {
+            "outputRange": [
+              0,
+              4095
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out0",
+      "writeTo": [
+        {
+          "driver": "output0",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out1",
+      "writeTo": [
+        {
+          "driver": "output1",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out2",
+      "writeTo": [
+        {
+          "driver": "output2",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out3",
+      "writeTo": [
+        {
+          "driver": "output3",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out4",
+      "writeTo": [
+        {
+          "driver": "output4",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out5",
+      "writeTo": [
+        {
+          "driver": "output5",
+          "envelope": {
+            "triggerArgument": 2,
+            "stopAmount": -1,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out6",
+      "writeTo": [
+        {
+          "driver": "output6",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out7",
+      "writeTo": [
+        {
+          "driver": "output7",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out8",
+      "writeTo": [
+        {
+          "driver": "output8",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out9",
+      "writeTo": [
+        {
+          "driver": "output9",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out10",
+      "writeTo": [
+        {
+          "driver": "output10",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "address": "/oschii/out11",
+      "writeTo": [
+        {
+          "driver": "output11",
+          "envelope": {
+            "triggerArgument": 2,
+            "valueTransform": {
+              "outputRange": [
+                0,
+                4095
+              ]
+            },
+            "steps": [
+              {
+                "startAmountFromArgument": 0,
+                "endAmountFromArgument": 1,
+                "timeFromArgument": 2
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "sensorMonitors": [
+    {
+      "sensor": "input0",
+      "sendTo": [
+        {
+          "*": "/oschii/sensor/00"
+        }
+      ]
+    },
+    {
+      "sensor": "input4",
+      "sendTo": [
+        {
+          "*": "/oschii/sensor/0"
+        }
+      ]
+    },
+    {
+      "sensor": "input5",
+      "sendTo": [
+        {
+          "*": "/oschii/sensor/1"
+        }
+      ]
+    },
+    {
+      "sensor": "input6",
+      "sendTo": [
+        {
+          "*": "/oschii/sensor/2"
+        }
+      ]
+    },
+    {
+      "sensor": "input7",
+      "sendTo": [
+        {
+          "*": "/oschii/sensor/3"
+        }
+      ]
+    },
+    {
+      "sensor": "input8",
+      "sendTo": [
+        {
+          "*": "/oschii/sensor/4"
+        }
+      ]
+    },
+    {
+      "sensor": "input9",
+      "sendTo": [
+        {
+          "*": "/oschii/sensor/5"
+        }
+      ]
+    }
+  ]
+}
