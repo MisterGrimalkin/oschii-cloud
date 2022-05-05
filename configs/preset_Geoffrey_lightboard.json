@@ -1,0 +1,31 @@
+{
+  "displays": [
+    {
+      "name": "lightboard",
+      "type": "rg-led",
+      "width": 128,
+      "height": 64,
+      "enablePin": 13,
+      "latchPin": 23,
+      "clockPin": 25,
+      "data1RPin": 14,
+      "data2RPin": 15,
+      "data1GPin": 21,
+      "data2GPin": 22,
+      "addr0Pin": 16,
+      "addr1Pin": 17,
+      "addr2Pin": 18,
+      "addr3Pin": 19
+    }
+  ],
+  "remotes": [
+    {
+      "address": "/display",
+      "writeTo": [
+        {
+          "target": "Display:lightboard"
+        }
+      ]
+    }
+  ]
+}

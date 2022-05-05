@@ -2,14 +2,16 @@ require_relative 'oschii'
 
 include Oschii
 
-@oschii = cloud(silent: true).wait_for('ada')
-
-exit unless @oschii
+# @oschii = cloud(silent: true).wait_for('ada')
+#
+# exit unless @oschii
 
 @board = []
 
-@width = 5
-@height = 9
+@osc = OSC::Client.new('192.168.1.22', 3333)
+
+@width = 1
+@height = 1
 
 def clear_board
   @height.times do |y|
@@ -24,27 +26,38 @@ def print_board
   message = []
   @height.times do |y|
     @width.times do |x|
-      print "#{@board[y][x]} "
+      # print "#{@board[y][x]} "
       if @board[y][x] == '#'
-        message += [11, 11, 11]
+        print "\r#{x} x #{y}        "
+        message += [255, 255, 255]
       else
         message += [0, 0, 0]
       end
     end
-    puts
+    # puts
   end
-  puts
-  ada.send_osc :display, *message
+  # puts message.join(',')
+  @osc.send(OSC::Message.new('/display', *message[0..128]))
+  # Thread.new do
+
+  # RestClient.post 'http://192.168.1.22/display',
+  #                 message.to_json,
+  #                 content_type: 'application/json'
+  # end
+
+  # ada.send_osc :display, *message
 end
 
-@ball_x = 2
-@ball_y = 4
+clear_board
+
+@ball_x = 58
+@ball_y = 11
 
 @dx = 1
 @dy = 1
 
 def update_board
-  clear_board
+  # clear_board
   @board[@ball_y][@ball_x] = '#'
 end
 
@@ -70,7 +83,7 @@ while true
   update_board
   print_board
 
-  sleep 0.2
+  sleep 1
 end
 
 

@@ -37,8 +37,8 @@ module Oschii
     raise NameError
   end
 
-  def send_osc(ip, address, value, port: 3333)
-    OSC::Client.new(ip, port).send(OSC::Message.new(address, value))
+  def send_osc(ip, address, *values, port: 3333)
+    OSC::Client.new(ip, port).send(OSC::Message.new(address, *values.to_a))
   end
 end
 
