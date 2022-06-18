@@ -115,7 +115,8 @@ module LightSign
     end
 
     def update_all_devices
-      devices.each do |_name, device|
+      devices.each do |name, device|
+        puts "Updating #{name}"
         device.update_from_file
       end
     end
@@ -231,3 +232,10 @@ def server
 end
 
 server
+
+puts '-- Server is online (CTRL+C to stop) --'
+puts
+
+loop do
+
+end
