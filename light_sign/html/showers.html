@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8'>
+    <title>LightSign Server</title>
+</head>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function() {
+            if (this.readyState == 4 ) {
+                if ( this.status == 200 ) {
+                    var data = JSON.parse(this.responseText);
+                    document.getElementById('female-number').value = data['female'];
+                    document.getElementById('male-number').value = data['male'];
+                }
+            }
+        }
+        request.open("GET", "/api/showers");//, true);
+        request.setRequestHeader('Accept', 'application/json');
+        request.send();
+    });
+
+    function updateFemale() {
+        var value = document.getElementById('female-number').value;
+        var request = new XMLHttpRequest();
+        request.open("POST", "/api/female");
+        request.send(value);
+    }
+
+    function incrementFemale() {
+        var txt = document.getElementById('female-number');
+        var value = parseInt(txt.value);
+        value++;
+        txt.value = value;
+        updateFemale();
+    }
+
+    function updateMale() {
+        var value = document.getElementById('male-number').value;
+        var request = new XMLHttpRequest();
+        request.open("POST", "/api/male");
+        request.send(value);
+    }
+
+    function incrementMale() {
+        var txt = document.getElementById('male-number');
+        var value = parseInt(txt.value);
+        value++;
+        txt.value = value;
+        updateMale();
+    }
+</script>
+
+<style>
+    table {
+        width: 100%;
+    }
+
+    .label {
+        text-align: right;
+        height: 200px;
+    }
+
+    .field {
+        width: 30%;
+        height: 100%;
+    }
+</style>
+
+<body>
+<table>
+    <tr>
+        <td class="label">Female</td>
+        <td>
+            <input type="text" id="female-number"
+                   class="field"
+                   onchange="updateFemale()">
+        </td>
+        <td>
+            <button onclick="incrementFemale()">+</button>
+        </td>
+    </tr>
+    <tr>
+        <td class="label">Male</td>
+        <td>
+            <input type="text" id="male-number"
+                   class="field"
+                   onchange="updateMale()">
+        </td>
+        <td>
+            <button onclick="incrementMale()">+</button>
+        </td>
+    </tr>
+</table>
+
+</body>
+
+</html>
