@@ -55,6 +55,7 @@ module Oschii
 
     def start_listening
       server.add_method RESPONSE_ADDR do |message|
+        puts message
         name = message.to_a.first.split(':').last.strip
         if (node = nodes[name.downcase.to_sym])
           puts "\n==> '#{name}' is back\n" unless silent
