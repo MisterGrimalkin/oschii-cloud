@@ -44,16 +44,20 @@ module LightSign
         [200, File.read('html/showers.html')]
       end
 
+      get '/messages' do
+        [200, File.read('html/messages.html')]
+      end
+
       # API....
 
       get '/api/config' do
-        [200, File.read('config.json')]
+        [200, File.read('config/config.json')]
       end
 
       post '/api/config' do |payload|
         begin
           data = JSON.parse(payload)
-          File.write('config.json', JSON.pretty_generate(data))
+          File.write('config/config.json', JSON.pretty_generate(data))
           update_all_devices
           [200, 'OK']
 
@@ -63,7 +67,7 @@ module LightSign
       end
 
       get '/api/showers' do
-        [200, File.read('showers.json')]
+        [200, File.read('config/showers.json')]
       end
 
       post '/api/male' do |payload|
@@ -82,13 +86,18 @@ module LightSign
         [200, payload]
       end
 
+      post '/api/refresh' do
+        update_all_devices
+        push_shower_tickets
+      end
+
       ping_network
     end
 
     attr_reader :devices
 
     def shower_tickets
-      JSON.parse(File.read('showers.json'))
+      JSON.parse(File.read('config/showers.json'))
     end
 
     def push_shower_tickets
@@ -111,7 +120,7 @@ module LightSign
     end
 
     def save_shower_tickets(data)
-      File.write('showers.json', JSON.pretty_generate(data))
+      File.write('config/showers.json', JSON.pretty_generate(data))
     end
 
     def update_all_devices
@@ -227,15 +236,3 @@ module LightSign
   end
 end
 
-def server
-  @server ||= LightSign::Server.new
-end
-
-server
-
-puts '-- Server is online (CTRL+C to stop) --'
-puts
-
-loop do
-
-end

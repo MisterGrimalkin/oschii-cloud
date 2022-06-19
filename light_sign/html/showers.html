@@ -1,55 +1,61 @@
 <!DOCTYPE html>
 <html lang='en'>
 <head>
+    <title>LightSign - Showers</title>
     <meta charset='utf-8'>
-    <title>LightSign Server</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchTicketNumbers();
+    });
+
+    function fetchTicketNumbers() {
         var request = new XMLHttpRequest();
-        request.onreadystatechange = function() {
-            if (this.readyState == 4 ) {
-                if ( this.status == 200 ) {
+        request.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
                     var data = JSON.parse(this.responseText);
                     document.getElementById('female-number').value = data['female'];
                     document.getElementById('male-number').value = data['male'];
                 }
             }
-        }
+        };
         request.open("GET", "/api/showers");//, true);
         request.setRequestHeader('Accept', 'application/json');
         request.send();
-    });
+    }
 
-    function updateFemale() {
-        var value = document.getElementById('female-number').value;
+    function refresh() {
         var request = new XMLHttpRequest();
-        request.open("POST", "/api/female");
+        request.open("POST", "/api/refresh");
+        request.send();
+    }
+
+    function updateTicket(gender) {
+        var value = document.getElementById(gender + '-number').value;
+        var request = new XMLHttpRequest();
+        request.open("POST", "/api/" + gender);
         request.send(value);
     }
 
-    function incrementFemale() {
-        var txt = document.getElementById('female-number');
-        var value = parseInt(txt.value);
-        value++;
-        txt.value = value;
-        updateFemale();
+    function incrementTicket(gender) {
+        var txt = document.getElementById(gender + '-number');
+        txt.value = parseInt(txt.value) + 1;
+        updateTicket(gender);
     }
 
-    function updateMale() {
-        var value = document.getElementById('male-number').value;
-        var request = new XMLHttpRequest();
-        request.open("POST", "/api/male");
-        request.send(value);
-    }
-
-    function incrementMale() {
-        var txt = document.getElementById('male-number');
-        var value = parseInt(txt.value);
-        value++;
-        txt.value = value;
-        updateMale();
+    function resetTickets() {
+        document.getElementById('female-number').value = '';
+        document.getElementById('male-number').value = '';
+        updateTicket('female');
+        updateTicket('male');
+        fetchTicketNumbers();
     }
 </script>
 
@@ -58,41 +64,101 @@
         /*width: 100%;*/
     }
 
-    .label {
+    .gender-label {
         text-align: right;
+        height: 200px;
+        padding-top: 55px;
+        font-size: 50px;
     }
 
-    .field {
-        width: 70%;
-        height: 100%;
+    .ticket-number {
+        font-size: 80px;
+        height: 200px;
+        text-align: center;
+        background-color: rgba(100, 100, 255, 0.1);
+    }
+
+    .increment-button {
+        font-size: 60px;
+        margin-top: 45px;
+        font-weight: bolder;
+        width: 90px;
     }
 </style>
 
 <body>
-<table>
-    <tr>
-        <td class="label">Female</td>
-        <td>
-            <input type="text" id="female-number"
-                   class="field"
-                   onchange="updateFemale()">
-        </td>
-        <td>
-            <button onclick="incrementFemale()">+</button>
-        </td>
-    </tr>
-    <tr>
-        <td class="label">Male</td>
-        <td>
-            <input type="text" id="male-number"
-                   class="field"
-                   onchange="updateMale()">
-        </td>
-        <td>
-            <button onclick="incrementMale()">+</button>
-        </td>
-    </tr>
-</table>
+
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1>LightSign</h1>
+        <h2>Shower Tickets</h2>
+        <!--<div class="btn-group">-->
+        <!--<button type="button" class="btn btn-primary">Apple</button>-->
+        <!--<button type="button" class="btn btn-primary">Samsung</button>-->
+        <!--<button type="button" class="btn btn-primary">Sony</button>-->
+        <!--</div>-->
+    </div>
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-3">
+            <h2 class="gender-label">Female</h2>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" class="form-control ticket-number"
+                   id="female-number"
+                   onchange="updateTicket('female')">
+        </div>
+        <div class="col-sm-1">
+            <button class="btn btn-lg btn-success increment-button"
+                    onclick="incrementTicket('female')">
+                +
+            </button>
+        </div>
+        <div class="col-sm-3"></div>
+    </div>
+    <div class="row"></div>
+    <div class="row">
+        <div class="col-sm-2"></div>
+        <div class="col-sm-3">
+            <h2 class="gender-label">Male</h2>
+        </div>
+        <div class="col-sm-3">
+            <input type="text" class="form-control ticket-number"
+                   id="male-number"
+                   onchange="updateTicket('male')">
+        </div>
+        <div class="col-sm-1">
+            <button class="btn btn-lg btn-success increment-button"
+                    onclick="incrementTicket('male')">
+                +
+            </button>
+        </div>
+        <div class="col-sm-3"></div>
+    </div>
+
+    <div class="row" style="text-align: center">
+        <div class="col-sm-12">
+            <button type="button"
+                    class="btn btn-lg btn-default"
+                    onclick='resetTickets();'>
+                Reset Ticket Numbers
+            </button>
+        </div>
+    </div>
+
+    <br/>
+
+    <div class="jumbotron" style="text-align: center">
+        <a href="/messages" class="btn btn-lg btn-primary">
+            Edit Messages
+        </a>
+        <button type="button"
+                class="btn btn-lg btn-warning"
+                onclick='refresh()'>
+            Refresh All Devices
+        </button>
+    </div>
+</div>
 
 </body>
 

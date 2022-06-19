@@ -11,7 +11,7 @@ module LightSign
 
     # Uploaders....
 
-    def update_from_file(filename = 'config.json')
+    def update_from_file(filename = 'config/config.json')
       return unless File.exists? filename
       data = JSON.parse(File.read(filename))
       update data

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <title>LightSign - Messages</title>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchConfig();
+    });
+
+    function refresh() {
+        var request = new XMLHttpRequest();
+        request.open("POST", "/api/refresh");
+        request.send();
+    }
+
+    function fetchConfig() {
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    document.getElementById('config-field').value = this.responseText;
+
+                }
+            }
+        };
+        request.open("GET", "/api/config");//, true);
+        request.setRequestHeader('Accept', 'application/json');
+        request.send();
+    }
+
+    function updateConfig() {
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    fetchConfig();
+                }
+            }
+        };
+        request.open("POST", "/api/config");
+        request.setRequestHeader('Accept', 'application/json');
+        request.send($("#config-field").val());
+    }
+</script>
+
+<style>
+</style>
+
+<body>
+
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1>LightSign</h1>
+        <h2>Messages</h2>
+    </div>
+    <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-8">
+            <textarea class="form-control big-editor"
+                      rows="30"
+                      id="config-field">
+            </textarea>
+        </div>
+        <div class="col-sm-2">
+            <button class="btn btn-lg btn-success"
+                    id="update-button"
+                    style="width: 100%"
+                    onclick="updateConfig()"
+            >
+                Update
+            </button>
+            <br/>
+            <br/>
+            <button class="btn btn-lg btn-default"
+                    id="revert-button"
+                    style="width: 100%"
+                    onclick="fetchConfig()"
+            >
+                Revert
+            </button>
+        </div>
+        <div class="col-sm-1"></div>
+    </div>
+
+    <br/>
+
+    <div class="jumbotron" style="text-align: center">
+        <a href="/showers" class="btn btn-lg btn-primary">
+            Showers
+        </a>
+        <button type="button"
+                class="btn btn-lg btn-warning"
+                onclick='refresh()'>
+            Refresh All Devices
+        </button>
+    </div>
+</div>
+
+</body>
+
+</html>
