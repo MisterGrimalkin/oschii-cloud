@@ -1,7 +1,7 @@
 {
   "Events": {
     "Thursday": {
-      "11:00": "Thursday 11am",
+      "11:00": "Thursday eleven of the A to the M",
       "14:00": "Thursday at the 2pm"
     },
     "Friday": {
@@ -17,7 +17,7 @@
   },
   "Messages": {
     "Small": [
-      "{green}RULE ONE {red}is {yellow}Fun",
+      "{green}RULE ONE {red}- {yellow}Fun",
       "{green}RULE TWO {red}- {yellow}Don't be a dick",
       "{yellow}Safety {green}THIRD",
       "{blue}We {red}Don't Talk {blue}About RULE FOUR"

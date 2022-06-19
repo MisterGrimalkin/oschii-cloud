@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <title>LightSign - Scenes</title>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchConfig();
+    });
+
+    function refresh() {
+        var request = new XMLHttpRequest();
+        request.open("POST", "/api/refresh");
+        request.send();
+    }
+
+    function showers() {
+        var request = new XMLHttpRequest();
+        request.open("POST", "/scene/showers");
+        request.send();
+    }
+
+    function events() {
+        var request = new XMLHttpRequest();
+        request.open("POST", "/scene/events");
+        request.send();
+    }
+
+    function bigScroller() {
+        var request = new XMLHttpRequest();
+        request.open("POST", "/scene/big_scroller");
+        request.send();
+    }
+
+    function holodeck() {
+        var request = new XMLHttpRequest();
+        request.open("POST", "/scene/holodeck");
+        request.send();
+    }
+</script>
+
+<style>
+</style>
+
+<body>
+
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1>LightSign</h1>
+        <h2>Scenes</h2>
+    </div>
+
+    <div class="row" style="text-align: center">
+        <h2>Activate Scene:</h2>
+        <button class="btn btn-lg btn-success" onclick="showers()">
+            Showers
+        </button>
+        <button class="btn btn-lg btn-success" onclick="events()">
+            Events
+        </button>
+        <button class="btn btn-lg btn-success" onclick="bigScroller()">
+            Big Scroller
+        </button>
+        <button class="btn btn-lg btn-success" onclick="holodeck()">
+            Holodeck
+        </button>
+    </div>
+
+    <br/>
+    <br/>
+
+    <div class="jumbotron" style="text-align: center">
+        <a href="/showers" class="btn btn-lg btn-default">
+            Shower Tickets
+        </a>
+        <a href="/messages" class="btn btn-lg btn-default">
+            Messages
+        </a>
+        &nbsp;
+        <button type="button"
+                class="btn btn-lg btn-warning"
+                onclick='refresh()'>
+            Refresh All Devices
+        </button>
+    </div>
+</div>
+
+</body>
+
+</html>

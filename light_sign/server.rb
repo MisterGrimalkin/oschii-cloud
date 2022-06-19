@@ -48,6 +48,36 @@ module LightSign
         [200, File.read('html/messages.html')]
       end
 
+      get '/scenes' do
+        [200, File.read('html/scenes.html')]
+      end
+
+      # Scenes....
+
+      post '/scene/showers' do
+        devices.each do |_name, device|
+          device.showers
+        end
+      end
+
+      post '/scene/events' do
+        devices.each do |_name, device|
+          device.events
+        end
+      end
+
+      post '/scene/big_scroller' do
+        devices.each do |_name, device|
+          device.big_scroller
+        end
+      end
+
+      post '/scene/holodeck' do
+        devices.each do |_name, device|
+          device.holodeck
+        end
+      end
+
       # API....
 
       get '/api/config' do
