@@ -22,32 +22,27 @@
     }
 
     function fetchConfig() {
-        var request = new XMLHttpRequest();
-        request.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                if (this.status == 200) {
-                    document.getElementById('config-field').value = this.responseText;
-
-                }
+        $.ajax({
+            url: '/api/config',
+            method: 'GET',
+            success: function(response) {
+                document.getElementById('config-field').value = response;
             }
-        };
-        request.open("GET", "/api/config");//, true);
-        request.setRequestHeader('Accept', 'application/json');
-        request.send();
+        });
     }
 
     function updateConfig() {
-        var request = new XMLHttpRequest();
-        request.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                if (this.status == 200) {
-                    fetchConfig();
-                }
+        $.ajax({
+            url: '/api/config',
+            method: 'POST',
+            data: $("#config-field").val(),
+            success: function(response) {
+                fetchConfig();
+            },
+            error: function(response) {
+                window.alert("Invalid JSON document!");
             }
-        };
-        request.open("POST", "/api/config");
-        request.setRequestHeader('Accept', 'application/json');
-        request.send($("#config-field").val());
+        });
     }
 </script>
 

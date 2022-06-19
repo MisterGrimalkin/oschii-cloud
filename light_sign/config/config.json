@@ -1,7 +1,7 @@
 {
   "Events": {
     "Thursday": {
-      "11:00": "Thursday eleven of the A to the M",
+      "11:00": "Thursday eleven of the A to th",
       "14:00": "Thursday at the 2pm"
     },
     "Friday": {
@@ -23,8 +23,8 @@
       "{blue}We {red}Don't Talk {blue}About RULE FOUR"
     ],
     "Large": [
-      "{blue}Support {yellow}Ukraine",
-      "{red}There is no {green}Planet B"
+      "{blue}Support {yellow}Ukraine!!!",
+      "{red}There is no {green}Planet B!!!"
     ]
   }
 }
