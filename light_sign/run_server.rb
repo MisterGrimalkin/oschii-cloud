@@ -10,6 +10,8 @@ puts
 puts '+++ Server is online +++'
 puts
 
+server.ping_network
+
 loop do
 
 end

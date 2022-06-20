@@ -23,6 +23,9 @@ module LightSign
       puts "  #{local_ip_address}"
       puts
 
+      @http_server = TCPServer.new HTTP_PORT
+      @osc_server = OSC::EMServer.new OSC_PORT
+
       start_http_server
       start_osc_server
 
@@ -32,9 +35,9 @@ module LightSign
 
       osc '/checkin' do |message|
         name = message.to_a.first.split(':')[1].to_sym
-        devices[name] ||= Device.new(message.ip_address)
-        puts "#{name} checked in from #{message.ip_address}"
-        update_all_devices
+        devices[name] ||= Device.new(name, message.ip_address)
+        puts "#{Time.now} Checkin from '#{name}' on #{message.ip_address}"
+        devices[name].update_from_file
         push_shower_tickets
       end
 
@@ -120,17 +123,16 @@ module LightSign
         update_all_devices
         push_shower_tickets
       end
-
-      ping_network
     end
 
-    attr_reader :devices
+    attr_reader :devices, :http_server, :osc_server
 
     def shower_tickets
       JSON.parse(File.read('config/showers.json'))
     end
 
     def push_shower_tickets
+      puts 'Pushing shower tickets'
       tickets = shower_tickets
       devices.each do |_name, device|
         device.female tickets['female'].to_s
@@ -139,6 +141,7 @@ module LightSign
     end
 
     def update_shower_tickets(data)
+      puts 'Updating shower tickets'
       tickets = shower_tickets
       if data[:male]
         tickets['male'] = data[:male]
@@ -154,13 +157,14 @@ module LightSign
     end
 
     def update_all_devices
+      puts 'Updating all devices'
       devices.each do |name, device|
-        puts "Updating #{name}"
         device.update_from_file
       end
     end
 
     def ping_network
+      puts 'Scanning network'
       base_ip = local_ip_address.split('.')[0..2].join('.')
       (1..254).each do |i|
         target_ip = "#{base_ip}.#{i}"
@@ -171,9 +175,10 @@ module LightSign
     end
 
     def local_ip_address
-      until (addr = Socket.ip_address_list.detect { |intf| intf.ipv4_private? })
-      end
-      addr.ip_address
+      # until (addr = Socket.ip_address_list.detect { |intf| intf.ipv4_private? })
+      # end
+      # addr.ip_address
+      `hostname -I`.split[0]
     end
 
     def http_handlers
@@ -184,6 +189,7 @@ module LightSign
 
     def osc(address)
       osc_server.add_method address do |message|
+        puts 'Receive OSC'
         if block_given?
           yield message
         else
@@ -222,47 +228,68 @@ module LightSign
     def start_http_server
       Thread.new do
         loop do
-          client = http_server.accept
-          line = client.gets
-          # put client.ip
-          method, path, _ = line.split
-          headers = {}
+          begin
 
-          done = false
+            # puts 'HTTP Waiting for data'
 
-          until done do
-            line = client.gets
-            if line == "\r\n"
-              done = true
-            else
-              key, value = line.split(': ')
-              headers[key] = value
+            client = http_server.accept
+            # puts 'Got data'
+
+            remote_ip = client.peeraddr[2]
+            # puts remote_ip
+
+            line = ""
+            until (char = client.read(1)) == "\n"
+              line << char
             end
+
+            # puts line
+            method, path, _ = line.split
+            headers = {}
+
+            done = false
+
+            until done do
+              line = client.gets
+              # puts line
+              if line == "\r\n"
+                done = true
+              else
+                key, value = line.split(': ')
+                headers[key] = value
+              end
+            end
+
+            # puts 'Parsed data'
+
+            payload = client.read(headers['Content-Length'].to_i)
+
+            # puts payload
+
+            if (block = http_handlers[method.downcase.to_sym][path])
+              puts "#{Time.now} HTTP #{method} #{path} from #{remote_ip}"
+              status, body = block.call(payload)
+            else
+              puts "#{Time.now} HTTP #{method} #{path} NOT FOUND"
+              status, body = 404, 'Not Found'
+            end
+
+            # puts 'Writing to client'
+            client.puts "HTTP/1.1 #{status}\r\n\r\n#{body}\r\n"
+
+            # puts 'Closing connection'
+            client.close
+
+            # puts 'All Done'
+
+          rescue => e
+            puts "#{e.class} #{e.message}"
           end
-
-          payload = client.read(headers['Content-Length'].to_i)
-
-
-          if (block = http_handlers[method.downcase.to_sym][path])
-            status, body = block.call(payload)
-          else
-            status, body = 404, 'Not Found'
-          end
-
-          client.puts "HTTP/1.1 #{status}\r\n\r\n#{body}"
-          client.close
         end
       end
       puts "   HTTP: #{HTTP_PORT}"
     end
 
-    def osc_server
-      @osc_server ||= OSC::EMServer.new(OSC_PORT)
-    end
-
-    def http_server
-      @http_server ||= TCPServer.new HTTP_PORT
-    end
   end
 end
 

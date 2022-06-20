@@ -4,10 +4,13 @@ require 'osc-ruby/em_server'
 
 module LightSign
   class Device
-    def initialize(ip, port: 3333)
+    def initialize(name, ip, port: 3333)
+      @name = name;
       @ip = ip
       @port = port
     end
+
+    attr_reader :name, :ip, :port
 
     # Uploaders....
 
@@ -18,19 +21,37 @@ module LightSign
     end
 
     def update(data)
+      puts "#{Time.now} '#{name}' updating...."
+
       splash
 
       clear_events
 
+      days = []
+      times = []
+      titles = []
+
       data['Events'].each do |day, events|
         events.each do |time, title|
-          add_event day, time, title
+          days << day
+          times << time
+          titles << title
         end
       end
 
+      add_events days, times, titles
+
+      sleep 0.2
+
       scroller *data.dig('Messages', 'Small')
 
+      sleep 0.2
+
       big_messages *data.dig('Messages', 'Large')
+
+      sleep 0.2
+
+      puts "#{Time.now} Updated '#{name}'"
     end
 
     # Showers....
@@ -67,6 +88,12 @@ module LightSign
       add 'Events', 'Day', day
       add 'Events', 'Time', time
       add 'Events', 'Title', title
+    end
+
+    def add_events(days, times, titles)
+      add 'Events', 'Day', *days
+      add 'Events', 'Time', *times
+      add 'Events', 'Title', *titles
     end
 
     # Big Scroller....
@@ -130,17 +157,19 @@ module LightSign
     end
 
     def command(address, *values)
-      address = "/#{address}" unless address.start_with?('/')
-      osc_client.send(
-          OSC::Message.new(address, *values.to_a)
-      )
-      sleep 0.05
+      # Thread.new do
+        address = "/#{address}" unless address.start_with?('/')
+        osc_client.send(
+            OSC::Message.new(address, *values.to_a)
+        )
+        sleep 0.2
+      # end
     end
 
     private
 
     def osc_client
-      @osc_client ||= OSC::Client.new(@ip, @port)
+      @osc_client ||= OSC::Client.new(ip, port)
     end
   end
 end

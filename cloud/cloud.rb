@@ -55,7 +55,6 @@ module Oschii
 
     def start_listening
       server.add_method RESPONSE_ADDR do |message|
-        puts message
         name = message.to_a.first.split(':').last.strip
         if (node = nodes[name.downcase.to_sym])
           puts "\n==> '#{name}' is back\n" unless silent
@@ -216,9 +215,10 @@ module Oschii
     end
 
     def local_ip_address
-      until (addr = Socket.ip_address_list.detect { |intf| intf.ipv4_private? })
-      end
-      addr.ip_address
+      # until (addr = Socket.ip_address_list.detect { |intf| intf.ipv4_private? })
+      # end
+      # addr.ip_address
+      `hostname -I`.split[0]
     end
   end
 end

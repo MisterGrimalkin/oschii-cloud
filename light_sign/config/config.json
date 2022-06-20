@@ -1,18 +1,71 @@
 {
   "Events": {
     "Thursday": {
-      "11:00": "Thursday eleven of the A to th",
-      "14:00": "Thursday at the 2pm"
+      "01:30": "Sama' Abdulhadi",
+      "00:00": "Roger Sanchez",
+      "22:30": "This Is Now DJs",
+      "21:30": "Mr Bruce",
+      "20:30": "Woody Cook",
+      "19:45": "Steam Down",
+      "18:30": "Mera Bhai",
+      "18:00": "Lava La Rue",
+      "17:00": "Beatles Dub Club",
+      "16:00": "Will Varley",
+      "14:45": "OMG! It's The Church",
+      "13:45": "EFE",
+      "12:30": "Eva Lazarus",
+      "11:00": "Big Fish Little Fish",
+      "10:00": "Power Ballad Yoga"
     },
     "Friday": {
-      "23:00": "Friday 11pm"
+      "01:30": "He.She.They. Elkka",
+      "00:15": "He.She.They. Syreeta",
+      "23:00": "He.She.They. Chloe Caillet",
+      "21:45": "He.She.They. Maze & Masters",
+      "20:45": "She Drew The Gun",
+      "19:45": "Cuppy",
+      "19:00": "George Riley",
+      "18:00": "Scarlett O'Malley",
+      "17:15": "Dream Nails",
+      "16:15": "DJ Dick & MC Purky",
+      "15:30": "Rachel Chinouriri",
+      "14:15": "R.A.E",
+      "13:15": "NDA Launch Party",
+      "12:30": "Nova Twins",
+      "11:00": "BFLF w/ Arielle Free",
+      "10:00": "Power Ballad Yoga"
     },
     "Saturday": {
-      "19:00": "Saturday 7pm",
-      "Midnight": "Saturday Midnight"
+      "01:30": "Mella Dee",
+      "00:00": "Plump DJs",
+      "22:00": "Absolute",
+      "20:45": "Self Esteem",
+      "19:30": "Fleetmac Wood",
+      "18:45": "Easy Life",
+      "17:45": "",
+      "16:15": "",
+      "15:30": "",
+      "14:15": "",
+      "13:15": "",
+      "12:30": "",
+      "11:00": "",
+      "10:00": "a"
     },
-    "Monday": {
-      "06:59": "It {red}Hurts!"
+    "Sunday": {
+      "01:30": "Mella Dee",
+      "00:00": "Plump DJs",
+      "22:00": "Absolute",
+      "20:45": "Self Esteem",
+      "19:30": "Fleetmac Wood",
+      "18:45": "Easy Life",
+      "17:45": "",
+      "16:15": "",
+      "15:30": "",
+      "14:15": "",
+      "13:15": "",
+      "12:30": "",
+      "11:00": "",
+      "10:00": "a"
     }
   },
   "Messages": {
@@ -23,8 +76,11 @@
       "{blue}We {red}Don't Talk {blue}About RULE FOUR"
     ],
     "Large": [
-      "{blue}Support {yellow}Ukraine!!!",
-      "{red}There is no {green}Planet B!!!"
+      "{blue}Take {yellow}Action{red}!!!!!",
+      "{magenta}No More {red}Fake {magenta}Excuses",
+      "{red}ACT {white}NOW{red}!",
+      "{green}Defend Our {blue}Oceans",
+      "{yellow}Change {green}IS {yellow}Possible"
     ]
   }
 }

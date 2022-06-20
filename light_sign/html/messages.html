@@ -32,14 +32,19 @@
     }
 
     function updateConfig() {
+        var field = $("#config-field");
+        field.attr("disabled", true);
         $.ajax({
             url: '/api/config',
             method: 'POST',
-            data: $("#config-field").val(),
+            data: field.val(),
             success: function(response) {
                 fetchConfig();
+                field.attr("disabled", false);
+                window.alert("Configuration Updated 😊")
             },
             error: function(response) {
+                field.attr("disabled", false);
                 window.alert("Invalid JSON document!");
             }
         });
