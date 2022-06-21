@@ -4,7 +4,7 @@ require 'osc-ruby'
 require 'osc-ruby/em_server'
 
 OSC_PORT = 3333
-HTTP_PORT = 8000
+HTTP_PORT = 8001
 
 SPLASH = '
   .       .   ,  __.
@@ -16,11 +16,12 @@ SPLASH = '
 
 module LightSign
   class Server
+    CONFIG_LOCATION = LightSign::Device::CONFIG_LOCATION
+    HTML_LOCATION = '/home/pi/light_sign/html'.freeze
+
     def initialize
       puts
       puts SPLASH
-      puts
-      puts "  #{local_ip_address}"
       puts
 
       @http_server = TCPServer.new HTTP_PORT
@@ -29,6 +30,12 @@ module LightSign
       start_http_server
       start_osc_server
 
+      @bootstrap_min_css = File.read("#{HTML_LOCATION}/lib/bootstrap.min.css")
+      @jquery_min_js = File.read("#{HTML_LOCATION}/lib/jquery.min.js")
+      @bootstrap_min_js = File.read("#{HTML_LOCATION}/lib/bootstrap.min.js")
+
+      puts
+      puts "+++ Server Online: #{local_ip_address} +++"
       puts
 
       @devices = {}
@@ -44,15 +51,19 @@ module LightSign
       # UI....
 
       get '/showers' do
-        [200, File.read('html/showers.html')]
+        [200, read_html_file('showers.html'), 'text/html']
       end
 
       get '/messages' do
-        [200, File.read('html/messages.html')]
+        [200, read_html_file('messages.html'), 'text/html']
       end
 
       get '/scenes' do
-        [200, File.read('html/scenes.html')]
+        [200, read_html_file('scenes.html'), 'text/html']
+      end
+
+      get '/devices' do
+        [200, read_html_file('devices.html'), 'text/html']
       end
 
       # Scenes....
@@ -83,24 +94,53 @@ module LightSign
 
       # API....
 
+      post '/api/ping' do
+        @devices = {}
+
+        Thread.new do
+          ping_network
+        end
+      end
+
+      get '/api/devices' do
+        result = []
+        devices.each do |_name, device|
+          result << {
+              name: device.name,
+              ip: device.ip
+          }
+        end
+        # result << {
+        #     name: 'Bill',
+        #     ip: '2.0.0.123'
+        # }
+        # result << {
+        #     name: 'Bob',
+        #     ip: '2.0.0.138'
+        # }
+        [200, result.to_json, 'application/json']
+      end
+
       get '/api/config' do
-        [200, File.read('config/config.json')]
+        [200, JSON.pretty_generate(read_config_file('config.json')), 'text/plain']
       end
 
       post '/api/config' do |payload|
         begin
           data = JSON.parse(payload)
-          File.write('config/config.json', JSON.pretty_generate(data))
-          update_all_devices
+          File.write("#{CONFIG_LOCATION}/config.json", JSON.pretty_generate(data))
+          Thread.new do
+            update_all_devices
+          end
           [200, 'OK']
 
         rescue JSON::ParserError => e
-          [422, e.message]
+          [422, e.message, 'text/plain']
         end
       end
 
       get '/api/showers' do
-        [200, File.read('config/showers.json')]
+        [200, JSON.pretty_generate(read_config_file('showers.json')), 'application/json']
       end
 
       post '/api/male' do |payload|
@@ -123,21 +163,45 @@ module LightSign
         update_all_devices
         push_shower_tickets
       end
+
+      get '/lib/bootstrap.min.css' do
+        @bootstrap_min_css ||= File.read("#{HTML_LOCATION}/lib/bootstrap.min.css")
+        [200, @bootstrap_min_css, 'text/css']
+      end
+
+      get '/lib/jquery.min.js' do
+        @jquery_min_js ||= File.read("#{HTML_LOCATION}/lib/jquery.min.js")
+        [200, @jquery_min_js, 'application/javascript']
+      end
+
+      get '/lib/bootstrap.min.js' do
+        @bootstrap_min_js ||= File.read("#{HTML_LOCATION}/lib/bootstrap.min.js")
+        [200, @bootstrap_min_js, 'application/javascript']
+      end
+    end
+
+    def read_config_file(filename)
+      JSON.parse(File.read("#{CONFIG_LOCATION}/#{filename}"))
+    end
+
+    def read_html_file(filename)
+      File.read("#{HTML_LOCATION}/#{filename}")
     end
 
     attr_reader :devices, :http_server, :osc_server
 
     def shower_tickets
-      JSON.parse(File.read('config/showers.json'))
+      read_config_file('showers.json')
     end
 
     def push_shower_tickets
-      puts 'Pushing shower tickets'
+      puts "#{Time.now} Sending shower tickets...."
       tickets = shower_tickets
       devices.each do |_name, device|
         device.female tickets['female'].to_s
         device.male tickets['male'].to_s
       end
+      puts "#{Time.now} Shower tickets updated"
     end
 
     def update_shower_tickets(data)
@@ -153,7 +217,7 @@ module LightSign
     end
 
     def save_shower_tickets(data)
-      File.write('config/showers.json', JSON.pretty_generate(data))
+      File.write("#{CONFIG_LOCATION}/showers.json", JSON.pretty_generate(data))
     end
 
     def update_all_devices
@@ -268,28 +332,45 @@ module LightSign
 
             if (block = http_handlers[method.downcase.to_sym][path])
               puts "#{Time.now} HTTP #{method} #{path} from #{remote_ip}"
-              status, body = block.call(payload)
+              status, body, content_type = block.call(payload)
             else
-              puts "#{Time.now} HTTP #{method} #{path} NOT FOUND"
-              status, body = 404, 'Not Found'
+              # if (content = find_public_file(path))
+              #   puts "#{Time.now} HTTP Public file #{path}"
+              #   status, body, content_type = 200, content, 'text/plain'
+              # else
+                puts "#{Time.now} HTTP #{method} #{path} NOT FOUND"
+                status, body, content_type = 404, 'Not Found', 'text/plain'
+              # end
             end
 
             # puts 'Writing to client'
-            client.puts "HTTP/1.1 #{status}\r\n\r\n#{body}\r\n"
+            client.puts "HTTP/1.1 #{status}\r\nContent-Type: #{content_type}\r\n\r\n#{body}\r\n"
 
-            # puts 'Closing connection'
-            client.close
-
-            # puts 'All Done'
+              # puts 'Closing connection'
+              # client.close
+              #
+              # puts 'All Done'
 
           rescue => e
             puts "#{e.class} #{e.message}"
+            puts "#{e.backtrace.join("\n")}"
+            client.puts "HTTP/1.1 500\r\n\r\n#{e.message}\r\n"
+          ensure
+            client.close
           end
         end
       end
       puts "   HTTP: #{HTTP_PORT}"
     end
 
+    def find_public_file(path)
+      filename = "#{HTML_LOCATION}/public#{path}"
+
+      return nil unless File.exists? filename
+
+      File.read(filename)
+    end
   end
+
 end
 

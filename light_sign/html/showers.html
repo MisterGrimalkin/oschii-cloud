@@ -3,11 +3,14 @@
 <head>
     <title>LightSign - Showers</title>
     <meta charset='utf-8'>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!--<link rel="stylesheet" href="/lib/bootstrap.min.css">-->
+    <!--<script src="/lib/jquery.min.js"></script>-->
+    <!--<script src="/lib/bootstrap.min.js"></script>-->
 </head>
 
 <script>
@@ -65,24 +68,26 @@
     }
 
     .gender-label {
-        text-align: right;
-        height: 200px;
-        padding-top: 55px;
-        font-size: 50px;
+        text-align: center;
+        /*height: 60px;*/
+        /*padding-top: 55px;*/
+        font-size: x-large;
     }
 
     .ticket-number {
-        font-size: 80px;
-        height: 200px;
+        font-size: xx-large;
+        height: 60px;
         text-align: center;
+        /*width: calc(100% - 20px);*/
         background-color: rgba(100, 100, 255, 0.1);
     }
 
     .increment-button {
-        font-size: 60px;
-        margin-top: 45px;
+        font-size: x-large;
+        /*margin-top: 45px;*/
         font-weight: bolder;
-        width: 90px;
+        width: 100%;
+        height: 60px;
     }
 </style>
 
@@ -91,24 +96,32 @@
 <div class="container-fluid">
     <div class="jumbotron">
         <h1>LightSign</h1>
-        <h2>Shower Tickets</h2>
-        <!--<div class="btn-group">-->
-        <!--<button type="button" class="btn btn-primary">Apple</button>-->
-        <!--<button type="button" class="btn btn-primary">Samsung</button>-->
-        <!--<button type="button" class="btn btn-primary">Sony</button>-->
-        <!--</div>-->
+        <div class="btn-group">
+            <a href="/showers" class="btn btn-lg btn-primary">
+                Shower Tickets!
+            </a>
+            <a href="/messages" class="btn btn-lg btn-default">
+                Messages
+            </a>
+            <a href="/scenes" class="btn btn-lg btn-default">
+                Scenes
+            </a>
+            <a href="/devices" class="btn btn-lg btn-default">
+                Devices
+            </a>
+        </div>
     </div>
     <div class="row">
         <div class="col-sm-2"></div>
-        <div class="col-sm-3">
+        <div class="col-sm-2">
             <h2 class="gender-label">Female</h2>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-4">
             <input type="text" class="form-control ticket-number"
                    id="female-number"
                    onchange="updateTicket('female')">
         </div>
-        <div class="col-sm-1">
+        <div class="col-sm-1" style="text-align: center">
             <button class="btn btn-lg btn-success increment-button"
                     onclick="incrementTicket('female')">
                 +
@@ -116,18 +129,20 @@
         </div>
         <div class="col-sm-3"></div>
     </div>
-    <div class="row"></div>
+    <div class="row">
+        <br/>
+    </div>
     <div class="row">
         <div class="col-sm-2"></div>
-        <div class="col-sm-3">
+        <div class="col-sm-2">
             <h2 class="gender-label">Male</h2>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-4">
             <input type="text" class="form-control ticket-number"
                    id="male-number"
                    onchange="updateTicket('male')">
         </div>
-        <div class="col-sm-1">
+        <div class="col-sm-1" style="text-align: center">
             <button class="btn btn-lg btn-success increment-button"
                     onclick="incrementTicket('male')">
                 +
@@ -135,6 +150,9 @@
         </div>
         <div class="col-sm-3"></div>
     </div>
+
+    <br/>
+    <br/>
 
     <div class="row" style="text-align: center">
         <div class="col-sm-12">
@@ -144,23 +162,6 @@
                 Reset Ticket Numbers
             </button>
         </div>
-    </div>
-
-    <br/>
-
-    <div class="jumbotron" style="text-align: center">
-        <a href="/messages" class="btn btn-lg btn-default">
-            Messages
-        </a>
-        <a href="/scenes" class="btn btn-lg btn-default">
-            Scenes
-        </a>
-        &nbsp;
-        <button type="button"
-                class="btn btn-lg btn-warning"
-                onclick='refresh()'>
-            Refresh All Devices
-        </button>
     </div>
 </div>
 

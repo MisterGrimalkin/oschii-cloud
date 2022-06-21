@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!--<link rel="stylesheet" href="/lib/bootstrap.min.css">-->
+    <!--<script src="/lib/jquery.min.js"></script>-->
+    <!--<script src="/lib/bootstrap.min.js"></script>-->
 </head>
 
 <script>
@@ -25,7 +28,7 @@
         $.ajax({
             url: '/api/config',
             method: 'GET',
-            success: function(response) {
+            success: function (response) {
                 document.getElementById('config-field').value = response;
             }
         });
@@ -38,12 +41,12 @@
             url: '/api/config',
             method: 'POST',
             data: field.val(),
-            success: function(response) {
+            success: function (response) {
                 fetchConfig();
                 field.attr("disabled", false);
                 window.alert("Configuration Updated 😊")
             },
-            error: function(response) {
+            error: function (response) {
                 field.attr("disabled", false);
                 window.alert("Invalid JSON document!");
             }
@@ -59,7 +62,20 @@
 <div class="container-fluid">
     <div class="jumbotron">
         <h1>LightSign</h1>
-        <h2>Messages</h2>
+        <div class="btn-group">
+            <a href="/showers" class="btn btn-lg btn-default">
+                Shower Tickets
+            </a>
+            <a href="/messages" class="btn btn-lg btn-primary">
+                Messages
+            </a>
+            <a href="/scenes" class="btn btn-lg btn-default">
+                Scenes
+            </a>
+            <a href="/devices" class="btn btn-lg btn-default">
+                Devices
+            </a>
+        </div>
     </div>
     <div class="row">
         <div class="col-sm-1"></div>
@@ -88,23 +104,6 @@
             </button>
         </div>
         <div class="col-sm-1"></div>
-    </div>
-
-    <br/>
-
-    <div class="jumbotron" style="text-align: center">
-        <a href="/showers" class="btn btn-lg btn-default">
-            Shower Tickets
-        </a>
-        <a href="/scenes" class="btn btn-lg btn-default">
-            Scenes
-        </a>
-        &nbsp;
-        <button type="button"
-                class="btn btn-lg btn-warning"
-                onclick='refresh()'>
-            Refresh All Devices
-        </button>
     </div>
 </div>
 

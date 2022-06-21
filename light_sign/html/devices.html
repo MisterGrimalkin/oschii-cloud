@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <title>LightSign - Devices</title>
+    <meta charset='utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!--<link rel="stylesheet" href="/lib/bootstrap.min.css">-->
+    <!--<script src="/lib/jquery.min.js"></script>-->
+    <!--<script src="/lib/bootstrap.min.js"></script>-->
+</head>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchDevices();
+
+        setInterval(function () {
+            fetchDevices();
+        }, 15000);
+    });
+
+    function ping() {
+        $("#device-container").empty();
+        $.ajax({
+            url: '/api/ping',
+            method: 'POST'
+        });
+    }
+
+    function refresh() {
+        $.ajax({
+            url: '/api/refresh',
+            method: 'POST'
+        });
+    }
+
+    function fetchDevices() {
+        $.ajax({
+            url: '/api/devices',
+            method: 'GET',
+            success: function (json) {
+                var container = $("#device-container");
+                container.empty();
+
+                for (var i = 0; i < json.length; i++) {
+                    var device = json[i];
+
+                    var deviceElement = $("<div class='device'></div>")
+                            .html("<strong>" + device.name + "</strong><br>" + device.ip);
+                    container.append(deviceElement);
+                }
+            }
+        });
+    }
+
+</script>
+
+<style>
+    .device {
+        display: inline-block;
+        border: 1px solid #383838;
+        border-radius: 5px;
+        width: 200px;
+        height: 100px;
+        padding: 17px;
+        font-size: large;
+        background-color: rgba(180, 190, 201, 0.23);
+        margin: 10px;
+    }
+
+    .device strong {
+        font-size: x-large;
+    }
+
+    #device-container {
+        text-align: center;
+    }
+</style>
+
+<body>
+
+<div class="container-fluid">
+    <div class="jumbotron">
+        <h1>LightSign</h1>
+        <div class="btn-group">
+            <a href="/showers" class="btn btn-lg btn-default">
+                Shower Tickets
+            </a>
+            <a href="/messages" class="btn btn-lg btn-default">
+                Messages
+            </a>
+            <a href="/scenes" class="btn btn-lg btn-default">
+                Scenes
+            </a>
+            <a href="/devices" class="btn btn-lg btn-primary">
+                Devices
+            </a>
+        </div>
+    </div>
+
+    <div class="row" style="text-align: center">
+        <h2>LightSign Devices on Network:</h2>
+        <div id="device-container">
+
+        </div>
+    </div>
+
+    <br/>
+    <br/>
+
+    <div class="jumbotron" style="text-align: center">
+        <button type="button"
+                class="btn btn-lg btn-danger"
+                onclick='ping()'>
+            Scan Network for Devices
+        </button>
+        <button type="button"
+                class="btn btn-lg btn-success"
+                onclick='refresh()'>
+            Push to All Devices
+        </button>
+    </div>
+</div>
+
+</body>
+
+</html>

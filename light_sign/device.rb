@@ -4,6 +4,8 @@ require 'osc-ruby/em_server'
 
 module LightSign
   class Device
+    CONFIG_LOCATION = '/home/pi/light_sign/config'.freeze
+
     def initialize(name, ip, port: 3333)
       @name = name;
       @ip = ip
@@ -14,7 +16,7 @@ module LightSign
 
     # Uploaders....
 
-    def update_from_file(filename = 'config/config.json')
+    def update_from_file(filename = "#{CONFIG_LOCATION}/config.json")
       return unless File.exists? filename
       data = JSON.parse(File.read(filename))
       update data
