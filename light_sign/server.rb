@@ -48,7 +48,36 @@ module LightSign
         push_shower_tickets
       end
 
+      # System...
+
+      post '/snapper/trigger' do
+        trigger_snapper
+        [201, "Snap!\n", 'text/plain']
+      end
+
+      post '/snapper/preview_mode' do
+        [201, preview_mode, 'text/plain']
+      end
+
+      post '/snapper/slide_mode' do
+        [201, slide_mode, 'text/plain']
+      end
+
+      post '/snapper/camera' do |payload|
+        send_camera_command(payload)
+        [201, "OK\n", 'text/plain']
+      end
+
+      get '/snapper/camera/settings' do
+        [200, camera_settings, 'text/plain']
+      end
+
+
       # UI....
+
+      get '/' do
+        [200, read_html_file('index.html'), 'text/html']
+      end
 
       get '/showers' do
         [200, read_html_file('showers.html'), 'text/html']
@@ -178,6 +207,28 @@ module LightSign
         @bootstrap_min_js ||= File.read("#{HTML_LOCATION}/lib/bootstrap.min.js")
         [200, @bootstrap_min_js, 'application/javascript']
       end
+    end
+
+    def preview_mode
+      `/home/pi/snapper/modepreview.sh`
+    end
+
+    def slide_mode
+      `/home/pi/snapper/modeslide.sh`
+    end
+
+    def send_camera_command(command)
+      client = OSC::Client.new(local_ip_address, 5432)
+      client.send(OSC::Message.new('/camera', command))
+    end
+
+    def trigger_snapper
+      client = OSC::Client.new(local_ip_address, 5432)
+      client.send(OSC::Message.new('/trigger', 1))
+    end
+
+    def camera_settings
+      File.read('/home/pi/snapper/picamera.ini')
     end
 
     def read_config_file(filename)
